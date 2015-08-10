@@ -166,7 +166,17 @@ class thoughts_widget extends WP_Widget {
 // This is where the action happens
     function widget( $args, $instance ) {
         echo $args['before_widget'];
-        echo '<section id="thought-bubble-sidebar">';
+        echo '<div id="thought-bubble-sidebar" style="display: inline-block;
+  padding: 16px;
+  margin: 10px 0;
+  max-width: 468px;
+  border: #ddd 1px solid;
+  border-top-color: #eee;
+  border-bottom-color: #bbb;
+  border-radius: 5px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  font: bold 14px/18px Helvetica, Arial, sans-serif;
+  color: #000;">';
         if ( ! empty( $instance['title'] ) ) {
             echo $args['before_title'] . apply_filters( 'widget_title', $instance['title'] ). $args['after_title'];
         }
@@ -175,16 +185,18 @@ class thoughts_widget extends WP_Widget {
         function get_actual_posts_thought_bubble() {
 
             global $wpdb;
-            $result = $wpdb->get_row( "SELECT post_content,post_title FROM $wpdb->posts WHERE post_modified_gmt = (SELECT MAX(post_modified_gmt) FROM $wpdb->posts WHERE post_type = 'thought_bubble')" );
+            $result = $wpdb->get_row( "SELECT post_content,post_title,post_date, guid FROM $wpdb->posts WHERE post_modified_gmt = (SELECT MAX(post_modified_gmt) FROM $wpdb->posts WHERE post_type = 'thought_bubble')" );
             return $result;
         }
 
 // This is where you run the code and display the output
-        echo '<div class=thoughtbubble thoughtbubble-header><h1>Header</h1></div>';
-        echo '<div class=thoughtbubble thoughtbubble-inner>Test</div>';
+        $resultVar = get_actual_posts_thought_bubble();
+        $postDate = date('F j, Y, g:i a',strtotime($resultVar->post_date));
+        echo "<div style='text-decoration: underline;font: normal 16px/22px Georgia, Palatino, serif;margin: 0 5px 10px 0;'><h1>{$resultVar->post_title}</h1></div>";
+        echo "<div style='font-weight: normal;color: #666;font-size: 12px;'>{$resultVar->post_content} - <a href='{$resultVar->guid}'>{$postDate}</a></div>";
         //echo __( get_actual_posts_thought_bubble()->post_content, 'thought_widget_domain' );
         echo '</div>';
-        echo '</section>';
+        echo '</div>';
         echo $args['after_widget'];
     }
 
